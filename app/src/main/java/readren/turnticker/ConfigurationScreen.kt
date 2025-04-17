@@ -2,8 +2,6 @@ package readren.turnticker
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -17,8 +15,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Preview
 @Composable
-fun ConfigurationScreen(scaffoldPaddings: PaddingValues = PaddingValues(), appViewModel: AppViewModel = viewModel()) {
-	Surface(color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(scaffoldPaddings)) {
+fun ConfigurationScreen(appViewModel: AppViewModel = viewModel()) {
+	Surface {
 		Column {
 			Column(modifier = Modifier.border(width = 2.dp, color = MaterialTheme.colorScheme.outlineVariant)) {
 				Text(text = "Time", modifier = Modifier.align(Alignment.CenterHorizontally), fontSize = 30.sp)
@@ -41,7 +39,6 @@ fun ConfigurationScreen(scaffoldPaddings: PaddingValues = PaddingValues(), appVi
 				)
 			}
 		}
-
 	}
 }
 

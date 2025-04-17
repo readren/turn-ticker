@@ -12,22 +12,24 @@ class Player(val name: String) {
 
 	private var resumeInstant: Instant? = null
 
-	fun pause(currentInstant: Instant): Unit {
+	fun isConsuming(): Boolean = resumeInstant != null
+
+	fun pause(currentInstant: Instant) {
 		resumeInstant?.let { ri ->
 			this.timeConsumedPreviouslyInCurrentRound += currentInstant - ri
 			resumeInstant = null
 		}
 	}
 
-	fun resume(currentInstant: Instant): Unit {
+	fun resume(currentInstant: Instant) {
 		if (resumeInstant == null) resumeInstant = currentInstant
 	}
 
-	fun undoLastResume(): Unit {
+	fun undoLastResume() {
 		resumeInstant = null
 	}
 
-	fun onNewRound(currentInstant: Instant): Unit {
+	fun onNewRound(currentInstant: Instant) {
 		pause(currentInstant)
 		timeConsumedInPreviousRounds += timeConsumedPreviouslyInCurrentRound
 		timeConsumedPreviouslyInCurrentRound = 0
@@ -43,9 +45,10 @@ class Player(val name: String) {
 		return MILLIS_IN_A_SECOND - timeConsumed % MILLIS_IN_A_SECOND
 	}
 
-	fun reset(): Unit {
+	fun reset() {
 		timeConsumedInPreviousRounds = 0
 		timeConsumedPreviouslyInCurrentRound = 0
 		resumeInstant = null
 	}
 }
+

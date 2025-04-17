@@ -22,36 +22,69 @@ class AppViewModel : ViewModel() {
 	var selectedPlayer: Player? by mutableStateOf(null)
 		private set
 
+	var currentTime: Instant by mutableStateOf(0)
+		private set
+
+	fun getPlayer(name: String): Player? {
+		return players.find { it.name == name }
+	}
+
 	fun getPlayers(): List<Player> = players
 
 	fun isValidName(name: String): Boolean {
 		return players.none { it.name == name }
 	}
 
-	fun addPlayer(name: String): Unit {
+	fun addPlayer(name: String) {
 		if (isValidName(name)) players.add(Player(name))
 	}
 
-	fun removePlayer(name: String): Unit {
+	fun removePlayer(name: String) {
 		players.removeIf { it.name == name }
 	}
 
 	fun changeSelectedPlayer(player: Player?) {
 		selectedPlayer = player
-		if (player != null) startScheduledUpdates()
+		player?.let { if (it.isConsuming()) startScheduledUpdates() }
+	}
+
+	fun pauseSelectedPlayer() {
+		selectedPlayer?.pause(updateAndGetCurrentTime())
+	}
+
+	fun resumeSelectedPlayer() {
+		selectedPlayer?.let {
+			it.resume(updateAndGetCurrentTime())
+			startScheduledUpdates()
+		}
+	}
+
+	fun undoLastResume() {
+		selectedPlayer?.undoLastResume()
+		val sp = selectedPlayer
+		selectedPlayer = null
+		selectedPlayer = sp
+	}
+
+	fun reset() {
+		players.forEachIndexed { index, player ->
+			player.reset()
+			players[index] = player
+		}
 	}
 
 	private fun startScheduledUpdates() {
 		viewModelScope.launch {
-			while (true) {
-				val delayMs = selectedPlayer?.timeUntilNextVisibleChange(SystemClock.elapsedRealtime()) ?: break
-				if (delayMs > 0L) delay(delayMs)
-				selectedPlayer = selectedPlayer // force recompose
+			selectedPlayer?.let {
+				while (it.isConsuming()) {
+					delay(it.timeUntilNextVisibleChange(updateAndGetCurrentTime()))
+				}
 			}
 		}
 	}
 
-	fun reset(): Unit {
-		players.forEach { it.reset() }
+	private fun updateAndGetCurrentTime(): Instant {
+		currentTime  = SystemClock.elapsedRealtime()
+		return currentTime
 	}
 }
