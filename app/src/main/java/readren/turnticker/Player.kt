@@ -6,7 +6,8 @@ typealias Instant = Long
 val MILLIS_IN_A_SECOND: Long = 1000
 
 class Player(val name: String) {
-	private var timeConsumedInPreviousRounds: DurationMillis = 0
+	var timeConsumedInPreviousRounds: DurationMillis = 0
+		private set
 
 	private var timeConsumedPreviouslyInCurrentRound: DurationMillis = 0
 
@@ -38,11 +39,6 @@ class Player(val name: String) {
 	fun timeConsumedAt(currentInstant: Instant): DurationMillis {
 		val timeConsumedSinceLastResume = resumeInstant?.let { currentInstant - it } ?: 0
 		return timeConsumedInPreviousRounds + timeConsumedPreviouslyInCurrentRound + timeConsumedSinceLastResume
-	}
-
-	fun timeUntilNextVisibleChange(currentInstant: Instant): DurationMillis {
-		val timeConsumed = timeConsumedAt(currentInstant)
-		return MILLIS_IN_A_SECOND - timeConsumed % MILLIS_IN_A_SECOND
 	}
 
 	fun reset() {

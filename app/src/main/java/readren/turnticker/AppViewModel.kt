@@ -11,14 +11,24 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 enum class ScreenId { PRELUDE, VIEW_MODE, TIMERS }
-enum class ViewMode { CONSUMED_ABSOLUTE, CONSUMED_RELATIVE, REMAINING_ABSOLUTE, REMAINING_RELATIVE}
+enum class ViewMode(val displayName: String, val header: String, val showsRelativeTime: Boolean) {
+	CONSUMED_ABSOLUTE("absolute consumed time", "consumed time", false),
+	CONSUMED_RELATIVE("relative consumed time", "consumed time", true),
+	REMAINING_ABSOLUTE("absolute remaining time", "remaining time", false),
+	REMAINING_RELATIVE("relative remaining time", "remaining time",true),
+}
 
 class AppViewModel : ViewModel() {
 	var screenId: ScreenId by mutableStateOf<ScreenId>(ScreenId.PRELUDE)
-	var viewMode: ViewMode by mutableStateOf<ViewMode>(ViewMode.CONSUMED_ABSOLUTE)
+	var viewMode: ViewMode by mutableStateOf<ViewMode>(ViewMode.REMAINING_ABSOLUTE)
 
-	var initialTime: DurationMillis by mutableStateOf(0)
-	var roundBonus: DurationMillis by mutableStateOf(0)
+	var initialRemainingTime: DurationMillis by mutableStateOf(0)
+	var remainingTimeBonusPerRound: DurationMillis by mutableStateOf(0)
+	var initialTimeDifferenceThreshold: DurationMillis by mutableStateOf(0)
+	var thresholdBonusPerRound: DurationMillis by mutableStateOf(0)
+
+	var finishedRounds: Int by mutableStateOf(0)
+
 	private val players = mutableStateListOf<Player>()
 
 	var selectedPlayer: Player? by mutableStateOf(null)
@@ -68,6 +78,11 @@ class AppViewModel : ViewModel() {
 		selectedPlayer = sp
 	}
 
+	fun finishRound() {
+		finishedRounds++
+		players.forEach { it.onNewRound(updateAndGetCurrentTime()) }
+	}
+
 	fun reset() {
 		players.forEachIndexed { index, player ->
 			player.reset()
@@ -75,11 +90,28 @@ class AppViewModel : ViewModel() {
 		}
 	}
 
+	fun timePresentedFor(targetPlayer: Player): DurationMillis {
+		val timeConsumedByTargetPlayer = targetPlayer.timeConsumedAt(currentTime)
+		val timeConsumedInPreviousRoundsByFasterPlayer: DurationMillis = players.minOf{ it.timeConsumedInPreviousRounds }
+		when (viewMode) {
+			ViewMode.REMAINING_ABSOLUTE -> return initialRemainingTime + finishedRounds * remainingTimeBonusPerRound - timeConsumedByTargetPlayer
+			ViewMode.REMAINING_RELATIVE -> return initialTimeDifferenceThreshold + finishedRounds * thresholdBonusPerRound + timeConsumedInPreviousRoundsByFasterPlayer - timeConsumedByTargetPlayer
+			ViewMode.CONSUMED_ABSOLUTE -> return timeConsumedByTargetPlayer
+			ViewMode.CONSUMED_RELATIVE -> return timeConsumedByTargetPlayer - timeConsumedInPreviousRoundsByFasterPlayer
+		}
+	}
+
 	private fun startScheduledUpdates() {
 		viewModelScope.launch {
 			selectedPlayer?.let {
+				val timeConsumedInPreviousRoundsByFasterPlayer: DurationMillis = players.minOf{ it.timeConsumedInPreviousRounds }
 				while (it.isConsuming()) {
-					delay(it.timeUntilNextVisibleChange(updateAndGetCurrentTime()))
+					val timeConsumed = it.timeConsumedAt(updateAndGetCurrentTime())
+					val measuredTimeConsumed =
+						if (viewMode.showsRelativeTime) timeConsumed - timeConsumedInPreviousRoundsByFasterPlayer
+						else timeConsumed
+					val timeUntilNextVisibleChange = MILLIS_IN_A_SECOND - (measuredTimeConsumed % MILLIS_IN_A_SECOND)
+					delay(timeUntilNextVisibleChange)
 				}
 			}
 		}

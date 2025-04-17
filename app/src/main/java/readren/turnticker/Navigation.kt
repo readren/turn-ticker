@@ -32,8 +32,8 @@ fun Navigation(modifier: Modifier = Modifier, appViewModel: AppViewModel = viewM
 			label = {
 				Text("prelude")
 			},
-			selected = true,
-			onClick = { appViewModel.screenId = ScreenId.PRELUDE }
+			selected = appViewModel.screenId == ScreenId.PRELUDE,
+			onClick = { appViewModel.screenId = ScreenId.PRELUDE },
 		)
 		NavigationBarItem(
 			icon = {
@@ -45,7 +45,7 @@ fun Navigation(modifier: Modifier = Modifier, appViewModel: AppViewModel = viewM
 			label = {
 				Text("view mode")
 			},
-			selected = true,
+			selected = appViewModel.screenId == ScreenId.VIEW_MODE,
 			onClick = { appViewModel.screenId = ScreenId.VIEW_MODE }
 		)
 		NavigationBarItem(
@@ -58,8 +58,9 @@ fun Navigation(modifier: Modifier = Modifier, appViewModel: AppViewModel = viewM
 			label = {
 				Text("timers")
 			},
-			selected = false,
-			onClick = { appViewModel.screenId = ScreenId.TIMERS }
+			selected = appViewModel.screenId == ScreenId.TIMERS,
+			onClick = { appViewModel.screenId = ScreenId.TIMERS },
+			enabled = appViewModel.getPlayers().isNotEmpty()
 		)
 	}
 }

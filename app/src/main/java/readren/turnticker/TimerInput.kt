@@ -42,17 +42,16 @@ enum class TimeUnit(val displayName: String, val millis: Int) {
 	HOURS("Hours", 24 * 60 * 1000)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimerInput(
 	label: String,
+	initialValue: Long,
 	modifier: Modifier = Modifier,
-	initialValue: Int = 0,
 	initialUnit: TimeUnit = TimeUnit.MINUTES,
 	onTimeChange: (Long, TimeUnit) -> Unit
 ) {
-	var timeValue by remember { mutableStateOf(initialValue.toString()) }
 	var selectedUnit by remember { mutableStateOf(initialUnit) }
+	var timeValue by remember { mutableStateOf((initialValue/(selectedUnit.millis)).toString()) }
 	var unitMenuExpanded by remember { mutableStateOf(false) }
 
 
@@ -131,5 +130,5 @@ fun TimerInput(
 @Preview
 @Composable
 fun TimerInputPreview() {
-	TimerInput("Initial time") { t, u -> }
+	TimerInput("Initial time", 1234) { t, u -> }
 }
