@@ -1,6 +1,8 @@
 package readren.turnticker
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.twotone.DisplaySettings
+import androidx.compose.material.icons.twotone.Group
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -8,7 +10,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.material.icons.twotone.Settings
 import androidx.compose.material.icons.twotone.Timer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -24,15 +25,28 @@ fun Navigation(modifier: Modifier = Modifier, appViewModel: AppViewModel = viewM
 		NavigationBarItem(
 			icon = {
 				Icon(
-					imageVector = Icons.TwoTone.Settings,
-					contentDescription = "configuration"
+					imageVector = Icons.TwoTone.Group,
+					contentDescription = "prelude"
 				)
 			},
 			label = {
-				Text("configuration")
+				Text("prelude")
 			},
 			selected = true,
-			onClick = { appViewModel.stage = Stage.CONFIGURATION }
+			onClick = { appViewModel.screenId = ScreenId.PRELUDE }
+		)
+		NavigationBarItem(
+			icon = {
+				Icon(
+					imageVector = Icons.TwoTone.DisplaySettings,
+					contentDescription = "view mode"
+				)
+			},
+			label = {
+				Text("view mode")
+			},
+			selected = true,
+			onClick = { appViewModel.screenId = ScreenId.VIEW_MODE }
 		)
 		NavigationBarItem(
 			icon = {
@@ -45,7 +59,7 @@ fun Navigation(modifier: Modifier = Modifier, appViewModel: AppViewModel = viewM
 				Text("timers")
 			},
 			selected = false,
-			onClick = { appViewModel.stage = Stage.MATCH }
+			onClick = { appViewModel.screenId = ScreenId.TIMERS }
 		)
 	}
 }

@@ -30,9 +30,10 @@ fun Content() {
 			bottomBar = { Navigation() }
 		) { padding ->
 			Surface(color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(padding)) {
-				when (viewModel<AppViewModel>().stage) {
-					Stage.CONFIGURATION -> ConfigurationScreen()
-					Stage.MATCH -> MatchScreen()
+				when (viewModel<AppViewModel>().screenId) {
+					ScreenId.PRELUDE -> PreludeScreen()
+					ScreenId.VIEW_MODE -> ConfigurationScreen()
+					ScreenId.TIMERS -> TimersScreen()
 				}
 			}
 		}

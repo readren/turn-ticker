@@ -15,17 +15,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Preview
 @Composable
-fun ConfigurationScreen(appViewModel: AppViewModel = viewModel()) {
+fun PreludeScreen() {
+	val appViewModel: AppViewModel = viewModel()
 	Surface {
 		Column(modifier = Modifier.border(width = 2.dp, color = MaterialTheme.colorScheme.outlineVariant)) {
-			Text(text = "Time", modifier = Modifier.align(Alignment.CenterHorizontally), fontSize = 30.sp)
-			TimerInput("Initial time") { timerValue, unit ->
-				appViewModel.initialTime = timerValue * unit.millis
-			}
-			TimerInput("Round bonus time") { timerValue, unit ->
-				appViewModel.roundBonus = timerValue * unit.millis
-			}
+			Text(text = "Participant's names", modifier = Modifier.align(Alignment.CenterHorizontally), fontSize = 30.sp)
+			NameEntry(
+				names = appViewModel.getPlayers().map { it.name },
+				isNameValid = { name -> appViewModel.isValidName(name) },
+				onNameAdded = { name -> appViewModel.addPlayer(name) },
+				onNameRemoved = { name -> appViewModel.removePlayer(name) },
+				addButtonText = "Add",
+				placeholder = "enter a player name",
+			)
 		}
 	}
 }
-

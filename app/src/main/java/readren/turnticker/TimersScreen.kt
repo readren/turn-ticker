@@ -27,7 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import java.util.Locale
 
 @Composable
-fun MatchScreen(appViewModel: AppViewModel = viewModel()) {
+fun TimersScreen(appViewModel: AppViewModel = viewModel()) {
 	Column {
 		appViewModel.getPlayers().forEach { player ->
 			key(player.name) {

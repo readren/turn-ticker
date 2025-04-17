@@ -26,7 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
+//import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,7 +45,7 @@ fun NameEntry(
 ) {
 	var currentName by remember { mutableStateOf("") }
 	var nameError by remember { mutableStateOf(false) }
-	val focusManager = LocalFocusManager.current
+//	val focusManager = LocalFocusManager.current
 
 	fun addName() {
 		if (currentName.isNotBlank() && isNameValid(currentName)) {
@@ -140,7 +140,6 @@ private fun NameItem(
 			)
 		}
 	}
-//	}
 }
 
 @Preview

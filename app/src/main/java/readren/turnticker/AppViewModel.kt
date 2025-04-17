@@ -10,10 +10,12 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-enum class Stage { CONFIGURATION, MATCH }
+enum class ScreenId { PRELUDE, VIEW_MODE, TIMERS }
+enum class ViewMode { CONSUMED_ABSOLUTE, CONSUMED_RELATIVE, REMAINING_ABSOLUTE, REMAINING_RELATIVE}
 
 class AppViewModel : ViewModel() {
-	var stage: Stage by mutableStateOf<Stage>(Stage.CONFIGURATION)
+	var screenId: ScreenId by mutableStateOf<ScreenId>(ScreenId.PRELUDE)
+	var viewMode: ViewMode by mutableStateOf<ViewMode>(ViewMode.CONSUMED_ABSOLUTE)
 
 	var initialTime: DurationMillis by mutableStateOf(0)
 	var roundBonus: DurationMillis by mutableStateOf(0)

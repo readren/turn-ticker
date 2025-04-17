@@ -125,37 +125,6 @@ fun TimerInput(
 				}
 			}
 		}
-
-//		ExposedDropdownMenuBox(
-//			modifier = Modifier,
-//			expanded = unitMenuExpanded,
-//			onExpandedChange = { unitMenuExpanded = !unitMenuExpanded }
-//		) {
-//				TextField(
-//					readOnly = true,
-//					value = selectedUnit.displayName,
-//					onValueChange = { },
-//					trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = unitMenuExpanded) },
-//					modifier = Modifier
-//						.menuAnchor(MenuAnchorType.PrimaryNotEditable, true) // TODO try other arguments here
-//						.width(120.dp)
-//				)
-//			ExposedDropdownMenu(
-//				expanded = unitMenuExpanded,
-//				onDismissRequest = { unitMenuExpanded = false }
-//			) {
-//				TimeUnit.entries.forEach { unit ->
-//					DropdownMenuItem(
-//						text = { Text(unit.displayName) },
-//						onClick = {
-//							selectedUnit = unit
-//							unitMenuExpanded = false
-//							notifyChange()
-//						}
-//					)
-//				}
-//			}
-//		}
 	}
 }
 
