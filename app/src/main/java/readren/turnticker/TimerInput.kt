@@ -1,6 +1,7 @@
 package readren.turnticker
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -62,13 +64,15 @@ fun TimerInput(
 
 	Row(
 		modifier = modifier
+			.clip(MaterialTheme.shapes.medium)
+			.border(width = 2.dp, color = MaterialTheme.colorScheme.outline)
 			.fillMaxWidth()
 			.height(IntrinsicSize.Min),
-		verticalAlignment = Alignment.CenterVertically
+		verticalAlignment = Alignment.CenterVertically,
 	) {
 		TextField(
 			value = timeValue,
-			modifier = Modifier.weight(1f),
+			modifier = Modifier.weight(1f).fillMaxHeight(),
 			textStyle = TextStyle(fontSize = 20.sp),
 			onValueChange = { newValue ->
 				// Only allow positive integers (no decimals, no negatives)
@@ -82,15 +86,10 @@ fun TimerInput(
 			label = { Text(label, fontSize = 20.sp, color = MaterialTheme.colorScheme.primary) }
 		)
 
-		Spacer(modifier = Modifier.width(4.dp))
-
 		Box(
 			Modifier
 				.fillMaxHeight()
-				.background(
-					color = MaterialTheme.colorScheme.surfaceVariant,
-					shape = MaterialTheme.shapes.small
-				),
+				.background(color = MaterialTheme.colorScheme.surfaceVariant),
 			contentAlignment = Alignment.Center
 		) {
 			Column {

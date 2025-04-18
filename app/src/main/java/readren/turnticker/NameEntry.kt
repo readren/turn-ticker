@@ -39,7 +39,6 @@ fun NameEntry(
 	onNameAdded: (String) -> Unit,
 	onNameRemoved: (String) -> Unit,
 	modifier: Modifier = Modifier,
-	maxNames: Int = Int.MAX_VALUE,
 	addButtonText: String = "Add",
 	placeholder: String = "Enter a name"
 ) {
@@ -81,7 +80,7 @@ fun NameEntry(
 
 			Button(
 				onClick = { addName() },
-				enabled = names.size < maxNames
+				enabled = currentName.isNotBlank(),
 			) {
 				Text(addButtonText)
 			}
@@ -152,7 +151,6 @@ fun NameEntryPreview() {
 		isNameValid = { _ -> true },
 		onNameAdded = { _ -> },
 		onNameRemoved = { _ -> },
-		maxNames = Int.MAX_VALUE,
 		addButtonText = "Add",
 		placeholder = "Enter a name"
 	)

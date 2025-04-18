@@ -11,11 +11,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 enum class ScreenId { PRELUDE, VIEW_MODE, TIMERS }
-enum class ViewMode(val displayName: String, val header: String, val showsRelativeTime: Boolean) {
-	CONSUMED_ABSOLUTE("absolute consumed time", "consumed time", false),
-	CONSUMED_RELATIVE("relative consumed time", "consumed time", true),
-	REMAINING_ABSOLUTE("absolute remaining time", "remaining time", false),
-	REMAINING_RELATIVE("relative remaining time", "remaining time",true),
+enum class ViewMode(val displayName: String, val header: String, val showsRelativeTime: Boolean, val description: String) {
+	CONSUMED_ABSOLUTE("absolute consumed time", "consumed time", false, "Timers show the total time spent by each participant."),
+	CONSUMED_RELATIVE("relative consumed time", "consumed time", true, "Timers show the time spent by each participant relative to the time spent by the fastest participant until the previous round." ),
+	REMAINING_ABSOLUTE("absolute remaining time", "remaining time", false, "Timers show the remaining time for each participant."),
+	REMAINING_RELATIVE("relative remaining time", "remaining time",true, "Timers show the remaining time for each participant based on the time spent by the fastest participant until the previous round."),
 }
 
 class AppViewModel : ViewModel() {
