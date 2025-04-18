@@ -1,6 +1,6 @@
 package readren.turnticker
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.twotone.Undo
@@ -61,27 +62,26 @@ fun TimersScreen(appViewModel: AppViewModel = viewModel()) {
 }
 
 
-@Preview
 @Composable
 fun SelectedPlayer() {
 	val appViewModel: AppViewModel = viewModel()
 	appViewModel.selectedPlayer?.let { player ->
 		val timePresented = appViewModel.timePresentedFor(player)
-		Surface {
+		Surface(color = MaterialTheme.colorScheme.primary, border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline)) {
 			Column {
 				Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-					Text(player.name, style = MaterialTheme.typography.displaySmall)
+					Text(player.name, style = MaterialTheme.typography.displaySmall, modifier = Modifier.padding(start = 8.dp, end = 8.dp))
 					TimerDisplay(timePresented)
 				}
 				Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
 					IconButton(onClick = { appViewModel.resumeSelectedPlayer() }, enabled = !player.isConsuming()) {
-						Icon(Icons.TwoTone.PlayArrow, null)
+						Icon(Icons.TwoTone.PlayArrow, null, modifier = Modifier.size(200.dp))
 					}
 					IconButton(onClick = { appViewModel.pauseSelectedPlayer() }, enabled = player.isConsuming()) {
-						Icon(Icons.TwoTone.Pause, null)
+						Icon(Icons.TwoTone.Pause, null, modifier = Modifier.size(200.dp))
 					}
 					IconButton(onClick = { appViewModel.undoLastResume() }, enabled = player.isConsuming()) {
-						Icon(Icons.AutoMirrored.TwoTone.Undo, null)
+						Icon(Icons.AutoMirrored.TwoTone.Undo, null, modifier = Modifier.size(200.dp))
 					}
 				}
 			}
@@ -89,20 +89,20 @@ fun SelectedPlayer() {
 	}
 }
 
-@Preview
 @Composable
-fun UnselectedPlayer(playerName: String = "Fulano") {
+fun UnselectedPlayer(playerName: String) {
 	val appViewModel: AppViewModel = viewModel()
 	appViewModel.getPlayer(playerName)?.let { player ->
 		val timePresented = appViewModel.timePresentedFor(player)
-		Surface {
+		Surface(color = MaterialTheme.colorScheme.background, border = BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant)) {
 			Row(
 				horizontalArrangement = Arrangement.SpaceBetween,
 				verticalAlignment = Alignment.CenterVertically,
-				modifier = Modifier.fillMaxWidth().clickable { appViewModel.changeSelectedPlayer(player) },
+				modifier = Modifier
+					.fillMaxWidth()
+					.clickable { appViewModel.changeSelectedPlayer(player) },
 			) {
-				Text(playerName, style = MaterialTheme.typography.displaySmall)
-				Spacer(modifier = Modifier.width(8.dp))
+				Text(playerName, style = MaterialTheme.typography.displaySmall, modifier = Modifier.padding(start = 8.dp, end = 8.dp))
 				TimerDisplay(timePresented)
 			}
 		}
@@ -111,14 +111,15 @@ fun UnselectedPlayer(playerName: String = "Fulano") {
 
 @Composable
 fun TimerDisplay(timeInMillis: DurationMillis) {
-	val seconds = (timeInMillis / 1000) % 60
-	val minutes = (timeInMillis / (1000 * 60)) % 60
-	val hours = (timeInMillis / (1000 * 60 * 60))
-	val formattedTime = String.format(Locale.getDefault(), "%02d:%02d:%02d", hours, minutes, seconds)
+	val absTime = if (timeInMillis < 0) -timeInMillis else timeInMillis
+	val seconds = (absTime / 1000) % 60
+	val minutes = (absTime / (1000 * 60)) % 60
+	val hours = (absTime / (1000 * 60 * 60))
+	val formattedTime = String.format(Locale.getDefault(), "${if (timeInMillis < 0) "-" else " "}%02d:%02d:%02d", hours, minutes, seconds)
 
 	Text(
 		text = formattedTime,
 		style = MaterialTheme.typography.displayMedium,
-		modifier = Modifier.padding(8.dp)
+		modifier = Modifier.padding(8.dp),
 	)
 }

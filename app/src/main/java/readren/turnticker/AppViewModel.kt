@@ -19,12 +19,12 @@ enum class ViewMode(val displayName: String, val header: String, val showsRelati
 }
 
 class AppViewModel : ViewModel() {
-	var screenId: ScreenId by mutableStateOf<ScreenId>(ScreenId.PRELUDE)
-	var viewMode: ViewMode by mutableStateOf<ViewMode>(ViewMode.REMAINING_ABSOLUTE)
+	var screenId: ScreenId by mutableStateOf(ScreenId.PRELUDE)
+	var viewMode: ViewMode by mutableStateOf(ViewMode.REMAINING_ABSOLUTE)
 
-	var initialRemainingTime: DurationMillis by mutableStateOf(0)
+	var initialRemainingTime: DurationMillis by mutableStateOf(60_000)
 	var remainingTimeBonusPerRound: DurationMillis by mutableStateOf(0)
-	var initialTimeDifferenceThreshold: DurationMillis by mutableStateOf(0)
+	var initialTimeDifferenceThreshold: DurationMillis by mutableStateOf(60_000)
 	var thresholdBonusPerRound: DurationMillis by mutableStateOf(0)
 
 	var finishedRounds: Int by mutableStateOf(0)
@@ -80,10 +80,13 @@ class AppViewModel : ViewModel() {
 
 	fun finishRound() {
 		finishedRounds++
+		selectedPlayer = null
 		players.forEach { it.onNewRound(updateAndGetCurrentTime()) }
 	}
 
 	fun reset() {
+		finishedRounds = 0
+		selectedPlayer = null
 		players.forEachIndexed { index, player ->
 			player.reset()
 			players[index] = player

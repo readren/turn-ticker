@@ -1,5 +1,6 @@
 package readren.turnticker
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,21 +35,29 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun ConfigurationScreen() {
 	val appViewModel: AppViewModel = viewModel()
 	var viewModeMenuExpanded: Boolean by remember { mutableStateOf(false) }
-	Surface {
-		Column(modifier = Modifier.padding(top = 16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+	Surface(color = MaterialTheme.colorScheme.primary, modifier = Modifier.fillMaxWidth()) {
+		Column(modifier = Modifier.padding(top = 16.dp, bottom = 16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
 			Text("What is shown by timers?", modifier = Modifier.align(Alignment.CenterHorizontally), fontSize = 28.sp)
 			Box(Modifier.fillMaxWidth(), Alignment.Center) {
-				Row(Modifier.border(width = 2.dp, color = MaterialTheme.colorScheme.outlineVariant)) {
+				Row(
+					Modifier
+						.border(width = 2.dp, color = MaterialTheme.colorScheme.outline)
+						.background(MaterialTheme.colorScheme.surfaceDim)
+				) {
 					Text(
 						text = appViewModel.viewMode.displayName,
 						fontSize = 20.sp,
-						modifier = Modifier.clickable { viewModeMenuExpanded = true }.padding(2.dp, 0.dp),
-						color = MaterialTheme.colorScheme.onSurface
+						color = MaterialTheme.colorScheme.onSurface,
+						modifier = Modifier
+							.clickable { viewModeMenuExpanded = true }
+							.padding(8.dp),
 					)
 					Icon(
 						Icons.TwoTone.ArrowDropDown,
 						null,
-						Modifier.align(Alignment.CenterVertically).rotate(if (viewModeMenuExpanded) 180f else 0f),
+						Modifier
+							.align(Alignment.CenterVertically)
+							.rotate(if (viewModeMenuExpanded) 180f else 0f),
 						MaterialTheme.colorScheme.onSurface
 					)
 				}
@@ -68,6 +77,7 @@ fun ConfigurationScreen() {
 				}
 			}
 
+
 			when (appViewModel.viewMode) {
 				ViewMode.REMAINING_ABSOLUTE -> {
 					TimerInput("Absolute initial time", appViewModel.initialRemainingTime) { timerValue, unit ->
@@ -77,6 +87,7 @@ fun ConfigurationScreen() {
 						appViewModel.remainingTimeBonusPerRound = timerValue * unit.millis
 					}
 				}
+
 				ViewMode.REMAINING_RELATIVE -> {
 					TimerInput("Initial time difference threshold", appViewModel.initialTimeDifferenceThreshold) { timerValue, unit ->
 						appViewModel.initialTimeDifferenceThreshold = timerValue * unit.millis
@@ -85,6 +96,7 @@ fun ConfigurationScreen() {
 						appViewModel.thresholdBonusPerRound = timerValue * unit.millis
 					}
 				}
+
 				ViewMode.CONSUMED_ABSOLUTE -> {}
 				ViewMode.CONSUMED_RELATIVE -> {}
 			}
