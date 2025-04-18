@@ -10,10 +10,15 @@ class Player(val name: String) {
 		private set
 
 	private var timeConsumedPreviouslyInCurrentRound: DurationMillis = 0
+	private var timeSpentInPreviousRound: DurationMillis = 0
 
 	private var resumeInstant: Instant? = null
 
 	fun isConsuming(): Boolean = resumeInstant != null
+
+	fun allowsToFinishRound(): Boolean = resumeInstant == null && timeConsumedPreviouslyInCurrentRound > 0L
+
+	fun allowsToUndoRound(): Boolean = timeConsumedPreviouslyInCurrentRound == 0L
 
 	fun pause(currentInstant: Instant) {
 		resumeInstant?.let { ri ->
@@ -32,19 +37,20 @@ class Player(val name: String) {
 
 	fun onNewRound(currentInstant: Instant) {
 		pause(currentInstant)
+		timeSpentInPreviousRound = timeConsumedPreviouslyInCurrentRound
 		timeConsumedInPreviousRounds += timeConsumedPreviouslyInCurrentRound
 		timeConsumedPreviouslyInCurrentRound = 0
 	}
 
-	fun timeConsumedAt(currentInstant: Instant): DurationMillis {
-		val timeConsumedSinceLastResume = resumeInstant?.let { currentInstant - it } ?: 0
-		return timeConsumedInPreviousRounds + timeConsumedPreviouslyInCurrentRound + timeConsumedSinceLastResume
+	fun undoLastRound() {
+		timeConsumedInPreviousRounds -= timeSpentInPreviousRound
+		timeConsumedPreviouslyInCurrentRound = timeSpentInPreviousRound
+		timeSpentInPreviousRound = 0
 	}
 
-	fun reset() {
-		timeConsumedInPreviousRounds = 0
-		timeConsumedPreviouslyInCurrentRound = 0
-		resumeInstant = null
+	fun calcTimeConsumedAt(currentInstant: Instant): DurationMillis {
+		val timeConsumedSinceLastResume = resumeInstant?.let { currentInstant - it } ?: 0
+		return timeConsumedInPreviousRounds + timeConsumedPreviouslyInCurrentRound + timeConsumedSinceLastResume
 	}
 }
 

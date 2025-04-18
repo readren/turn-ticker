@@ -35,11 +35,13 @@ import java.util.Locale
 fun TimersScreen(appViewModel: AppViewModel = viewModel()) {
 	Surface {
 		Column {
-			Row(Modifier.align(Alignment.CenterHorizontally), verticalAlignment = Alignment.CenterVertically) {
+			Row(Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
 				Text("Round ${appViewModel.finishedRounds + 1}", style = MaterialTheme.typography.headlineLarge)
-				Spacer(Modifier.width(8.dp))
-				Button(onClick = { appViewModel.finishRound() }) {
+				Button(onClick = { appViewModel.finishRound() }, enabled = appViewModel.isFinishRoundEnabled) {
 					Text("Finish round")
+				}
+				IconButton(onClick = {appViewModel.undoRound()}, enabled = appViewModel.isUndoRoundEnabled) {
+					Icon(Icons.AutoMirrored.TwoTone.Undo, null, modifier = Modifier.size(200.dp))
 				}
 			}
 			Spacer(modifier = Modifier.width(8.dp))

@@ -27,6 +27,7 @@ class AppViewModel : ViewModel() {
 	var initialTimeDifferenceThreshold: DurationMillis by mutableStateOf(60_000)
 	var thresholdBonusPerRound: DurationMillis by mutableStateOf(0)
 
+//	var lastTouchedRound: Int by mutableStateOf(0)
 	var finishedRounds: Int by mutableStateOf(0)
 
 	private val players = mutableStateListOf<Player>()
@@ -36,6 +37,13 @@ class AppViewModel : ViewModel() {
 
 	var currentTime: Instant by mutableStateOf(0)
 		private set
+
+	var isFinishRoundEnabled: Boolean by mutableStateOf(false)
+		private set
+	var isUndoRoundEnabled: Boolean by mutableStateOf(false)
+		private set
+
+
 
 	fun getPlayer(name: String): Player? {
 		return players.find { it.name == name }
@@ -49,10 +57,13 @@ class AppViewModel : ViewModel() {
 
 	fun addPlayer(name: String) {
 		if (isValidName(name)) players.add(Player(name))
+		updateActionsEnablers()
 	}
 
 	fun removePlayer(name: String) {
+		getPlayer(name)?.pause(currentTime) // necessary to stop the scheduled updates for this player
 		players.removeIf { it.name == name }
+		updateActionsEnablers()
 	}
 
 	fun changeSelectedPlayer(player: Player?) {
@@ -62,6 +73,8 @@ class AppViewModel : ViewModel() {
 
 	fun pauseSelectedPlayer() {
 		selectedPlayer?.pause(updateAndGetCurrentTime())
+//		lastTouchedRound = finishedRounds + 1
+		updateActionsEnablers()
 	}
 
 	fun resumeSelectedPlayer() {
@@ -69,6 +82,7 @@ class AppViewModel : ViewModel() {
 			it.resume(updateAndGetCurrentTime())
 			startScheduledUpdates()
 		}
+		updateActionsEnablers()
 	}
 
 	fun undoLastResume() {
@@ -76,25 +90,39 @@ class AppViewModel : ViewModel() {
 		val sp = selectedPlayer
 		selectedPlayer = null
 		selectedPlayer = sp
+		updateActionsEnablers()
 	}
 
 	fun finishRound() {
-		finishedRounds++
-		selectedPlayer = null
-		players.forEach { it.onNewRound(updateAndGetCurrentTime()) }
-	}
-
-	fun reset() {
-		finishedRounds = 0
-		selectedPlayer = null
-		players.forEachIndexed { index, player ->
-			player.reset()
-			players[index] = player
+		if (isFinishRoundEnabled) {
+			finishedRounds++
+			selectedPlayer = null
+			players.forEach { it.onNewRound(updateAndGetCurrentTime()) }
+			updateActionsEnablers()
 		}
 	}
 
+	fun undoRound() {
+		if (isUndoRoundEnabled) {
+			finishedRounds--
+			selectedPlayer = null
+			players.forEach { it.undoLastRound() }
+			updateActionsEnablers()
+		}
+	}
+
+	fun reset() {
+//		lastTouchedRound = 0
+		finishedRounds = 0
+		selectedPlayer = null
+		players.forEachIndexed { index, player ->
+			players[index] = Player(player.name)
+		}
+		updateActionsEnablers()
+	}
+
 	fun timePresentedFor(targetPlayer: Player): DurationMillis {
-		val timeConsumedByTargetPlayer = targetPlayer.timeConsumedAt(currentTime)
+		val timeConsumedByTargetPlayer = targetPlayer.calcTimeConsumedAt(currentTime)
 		val timeConsumedInPreviousRoundsByFasterPlayer: DurationMillis = players.minOf{ it.timeConsumedInPreviousRounds }
 		when (viewMode) {
 			ViewMode.REMAINING_ABSOLUTE -> return initialRemainingTime + finishedRounds * remainingTimeBonusPerRound - timeConsumedByTargetPlayer
@@ -104,12 +132,17 @@ class AppViewModel : ViewModel() {
 		}
 	}
 
+	private fun updateActionsEnablers() {
+		isFinishRoundEnabled = players.all { it.allowsToFinishRound() }
+		isUndoRoundEnabled = players.all { it.allowsToUndoRound() } // && finishedRounds >= lastTouchedRound
+	}
+
 	private fun startScheduledUpdates() {
 		viewModelScope.launch {
 			selectedPlayer?.let {
 				val timeConsumedInPreviousRoundsByFasterPlayer: DurationMillis = players.minOf{ it.timeConsumedInPreviousRounds }
 				while (it.isConsuming()) {
-					val timeConsumed = it.timeConsumedAt(updateAndGetCurrentTime())
+					val timeConsumed = it.calcTimeConsumedAt(updateAndGetCurrentTime())
 					val measuredTimeConsumed =
 						if (viewMode.showsRelativeTime) timeConsumed - timeConsumedInPreviousRoundsByFasterPlayer
 						else timeConsumed
