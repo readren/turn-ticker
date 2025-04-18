@@ -80,19 +80,19 @@ fun ConfigurationScreen() {
 
 			when (appViewModel.viewMode) {
 				ViewMode.REMAINING_ABSOLUTE -> {
-					TimerInput("Absolute initial time", appViewModel.initialRemainingTime) { timerValue, unit ->
+					TimerInput("Initial time", appViewModel.initialRemainingTime) { timerValue, unit ->
 						appViewModel.initialRemainingTime = timerValue * unit.millis
 					}
-					TimerInput("Absolute time bonus per round", appViewModel.remainingTimeBonusPerRound) { timerValue, unit ->
+					TimerInput("Bonus per round", appViewModel.remainingTimeBonusPerRound) { timerValue, unit ->
 						appViewModel.remainingTimeBonusPerRound = timerValue * unit.millis
 					}
 				}
 
 				ViewMode.REMAINING_RELATIVE -> {
-					TimerInput("Initial time difference threshold", appViewModel.initialTimeDifferenceThreshold) { timerValue, unit ->
+					TimerInput("Time difference threshold", appViewModel.initialTimeDifferenceThreshold) { timerValue, unit ->
 						appViewModel.initialTimeDifferenceThreshold = timerValue * unit.millis
 					}
-					TimerInput("Threshold bonus per round", appViewModel.thresholdBonusPerRound) { timerValue, unit ->
+					TimerInput("Bonus per round", appViewModel.thresholdBonusPerRound) { timerValue, unit ->
 						appViewModel.thresholdBonusPerRound = timerValue * unit.millis
 					}
 				}
