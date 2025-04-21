@@ -12,10 +12,10 @@ import kotlinx.coroutines.launch
 
 enum class ScreenId { PRELUDE, VIEW_MODE, TIMERS }
 enum class ViewMode(val displayName: String, val header: String, val showsRelativeTime: Boolean, val description: String) {
-	CONSUMED_ABSOLUTE("absolute consumed time", "consumed time", false, "Timers show the total time spent by each participant."),
-	CONSUMED_RELATIVE("relative consumed time", "consumed time", true, "Timers show the time spent by each participant relative to the time spent by the fastest participant until the previous round." ),
-	REMAINING_ABSOLUTE("absolute remaining time", "remaining time", false, "Timers show the remaining time for each participant."),
-	REMAINING_RELATIVE("relative remaining time", "remaining time",true, "Timers show the remaining time for each participant based on the time spent by the fastest participant until the previous round."),
+	CONSUMED_ABSOLUTE("absolute consumed time", "consumed time", false, "Timers show the total time spent by each participant, calculated as: [Total Time Spent]."),
+	CONSUMED_RELATIVE("relative consumed time", "consumed time", true, "Timers show the time spent by each participant relative to the time spent by the fastest participant until the previous round inclusive, calculated as: [Total Time Spent] – [Fastest Player’s Total Time Spent Until Previous Round]." ),
+	REMAINING_ABSOLUTE("absolute remaining time", "remaining time", false, "Timers show the available time for the current turn, calculated as: [Initial Time] + [Bonus Per Round]*[Number of Rounds Finished] – [Total Time Spent] "),
+	REMAINING_RELATIVE("relative remaining time", "net remaining time",true, "Timers show the available time for the current turn, calculated as: [Base Time] + [Fastest Player’s Total Time Spent Until Previous Round] + [Bonus Per Round]*[Number of Rounds Finished] – [Total Time Spent]"),
 }
 
 class AppViewModel : ViewModel() {
@@ -43,6 +43,8 @@ class AppViewModel : ViewModel() {
 	var isUndoRoundEnabled: Boolean by mutableStateOf(false)
 		private set
 
+	var autoPauseWhenUnselected: Boolean by mutableStateOf(true)
+	var autoResumeWhenSelected: Boolean by mutableStateOf(true)
 
 
 	fun getPlayer(name: String): Player? {
@@ -67,8 +69,12 @@ class AppViewModel : ViewModel() {
 	}
 
 	fun changeSelectedPlayer(player: Player?) {
+		if (autoPauseWhenUnselected) pauseSelectedPlayer()
 		selectedPlayer = player
-		player?.let { if (it.isConsuming()) startScheduledUpdates() }
+		player?.let {
+			if (autoResumeWhenSelected && !it.allowsToFinishRound()) resumeSelectedPlayer()
+			if (it.isConsuming()) startScheduledUpdates()
+		}
 	}
 
 	fun pauseSelectedPlayer() {

@@ -1,6 +1,7 @@
 package readren.turnticker
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -20,16 +21,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun PreludeScreen() {
 	val appViewModel: AppViewModel = viewModel()
-	Surface {
-		Column(
-			horizontalAlignment = Alignment.CenterHorizontally,
-			modifier = Modifier.border(width = 2.dp, color = MaterialTheme.colorScheme.outlineVariant),
-		) {
+	Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+		Section {
 			Text(text = "Preparation", modifier = Modifier.align(Alignment.CenterHorizontally), fontSize = 30.sp)
 			Button(onClick = { appViewModel.reset() }) {
 				Text("Reset timers")
 			}
-			Spacer(modifier = Modifier.height(8.dp))
+		}
+		Section {
 			Text(text = "Participants", fontSize = 30.sp)
 			NameEntry(
 				names = appViewModel.getPlayers().map { it.name },

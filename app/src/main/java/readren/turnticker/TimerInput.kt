@@ -20,7 +20,9 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -32,8 +34,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,17 +59,18 @@ fun TimerInput(
 	onTimeChange: (Long, TimeUnit) -> Unit
 ) {
 	var selectedUnit by remember { mutableStateOf(initialUnit) }
-	var timeValue by remember { mutableStateOf((initialValue/(selectedUnit.millis)).toString()) }
+	var timeValue by remember { mutableStateOf(TextFieldValue((initialValue/(selectedUnit.millis)).toString())) }
 	var unitMenuExpanded by remember { mutableStateOf(false) }
 
 
 	fun notifyChange() {
-		val numericValue = if (timeValue.isEmpty()) 0L else timeValue.toLong()
+		val numericValue = if (timeValue.text.isEmpty()) 0L else timeValue.text.toLong()
 		onTimeChange(numericValue, selectedUnit)
 	}
 
 	Row(
 		modifier = modifier
+			.padding(start = 16.dp, end = 16.dp)
 			.clip(MaterialTheme.shapes.medium)
 			.border(width = 2.dp, color = MaterialTheme.colorScheme.outline)
 			.fillMaxWidth()
@@ -72,11 +79,17 @@ fun TimerInput(
 	) {
 		TextField(
 			value = timeValue,
-			modifier = Modifier.weight(1f).fillMaxHeight(),
-			textStyle = TextStyle(fontSize = 20.sp),
+			modifier = Modifier.weight(1f).fillMaxHeight().onFocusChanged { focusState ->
+				if (focusState.isFocused) {
+					timeValue = timeValue.copy(
+						selection = TextRange(0, timeValue.text.length)
+					)
+				}
+			},
+			textStyle = LocalTextStyle.current.copy(fontSize = 20.sp, textAlign = TextAlign.End),
 			onValueChange = { newValue ->
 				// Only allow positive integers (no decimals, no negatives)
-				if (newValue.isEmpty() || newValue.matches(Regex("^\\d+$"))) {
+				if (newValue.text.isEmpty() || newValue.text.matches(Regex("^\\d+$"))) {
 					timeValue = newValue
 					notifyChange()
 				}

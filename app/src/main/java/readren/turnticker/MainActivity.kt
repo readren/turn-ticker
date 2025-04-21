@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -29,7 +31,7 @@ fun Content() {
 		Scaffold(
 			bottomBar = { Navigation() }
 		) { padding ->
-			Surface(color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(padding)) {
+			Box(modifier = Modifier.padding(padding).background(color = MaterialTheme.colorScheme.background)) {
 				when (viewModel<AppViewModel>().screenId) {
 					ScreenId.PRELUDE -> PreludeScreen()
 					ScreenId.VIEW_MODE -> ConfigurationScreen()

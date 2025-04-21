@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.twotone.Undo
 import androidx.compose.material.icons.twotone.Pause
@@ -33,29 +35,36 @@ import java.util.Locale
 @Preview
 @Composable
 fun TimersScreen(appViewModel: AppViewModel = viewModel()) {
-	Surface {
-		Column {
-			Row(Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+	Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+		Section {
+			Row(
+				Modifier
+					.align(Alignment.CenterHorizontally)
+					.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
+			) {
 				Text("Round ${appViewModel.finishedRounds + 1}", style = MaterialTheme.typography.headlineLarge)
 				Button(onClick = { appViewModel.finishRound() }, enabled = appViewModel.isFinishRoundEnabled) {
 					Text("Finish round")
 				}
-				IconButton(onClick = {appViewModel.undoRound()}, enabled = appViewModel.isUndoRoundEnabled) {
+				IconButton(onClick = { appViewModel.undoRound() }, enabled = appViewModel.isUndoRoundEnabled) {
 					Icon(Icons.AutoMirrored.TwoTone.Undo, null, modifier = Modifier.size(200.dp))
 				}
 			}
-			Spacer(modifier = Modifier.width(8.dp))
+		}
+		Section {
 			Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 				Text("Participant", style = MaterialTheme.typography.headlineLarge, modifier = Modifier.padding(4.dp))
 				Text(appViewModel.viewMode.header, style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center, modifier = Modifier.padding(4.dp))
 			}
 			Spacer(modifier = Modifier.width(8.dp))
-			appViewModel.getPlayers().forEach { player ->
-				key(player.name) {
-					if (player == appViewModel.selectedPlayer) {
-						SelectedPlayer()
-					} else {
-						UnselectedPlayer(player.name)
+			Column(Modifier.verticalScroll(rememberScrollState())) {
+				appViewModel.getPlayers().forEach { player ->
+					key(player.name) {
+						if (player == appViewModel.selectedPlayer) {
+							SelectedPlayer()
+						} else {
+							UnselectedPlayer(player.name)
+						}
 					}
 				}
 			}
@@ -96,7 +105,11 @@ fun UnselectedPlayer(playerName: String) {
 	val appViewModel: AppViewModel = viewModel()
 	appViewModel.getPlayer(playerName)?.let { player ->
 		val timePresented = appViewModel.timePresentedFor(player)
-		Surface(color = MaterialTheme.colorScheme.background, border = BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant)) {
+		val allowsToFinishRound = player.allowsToFinishRound()
+		Surface(
+			color = if (allowsToFinishRound) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.primaryContainer,
+			border = BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant)
+		) {
 			Row(
 				horizontalArrangement = Arrangement.SpaceBetween,
 				verticalAlignment = Alignment.CenterVertically,
